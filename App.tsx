@@ -1,8 +1,8 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  Animated,
   Dimensions,
-  FlatList,
   Image,
   StyleSheet,
   Text,
@@ -19,14 +19,16 @@ const { width } = Dimensions.get("window");
 
 const ITEM_SIZE = width * 0.72;
 const SPACING = 10;
+const SPACER_ITEM_SIZE = (width - ITEM_SIZE) / 2;
 
-export default function App() {
-  const [movies, setMovies] = useState<Movie[]>([]);
+const App: React.FC = () => {
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const [movies, setMovies] = useState<Partial<Movie>[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       const movies = await getMovies();
-      setMovies(movies);
+      setMovies([{ key: "left-spacer" }, ...movies, { key: "right-spacer" }]);
     };
 
     if (movies.length === 0) {
@@ -41,24 +43,48 @@ export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar hidden />
-      <FlatList
+      <Animated.FlatList
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.key}
+        keyExtractor={(item) => item.key as string}
         contentContainerStyle={{
           alignItems: "center",
         }}
         horizontal
         data={movies}
-        renderItem={({ item }) => {
+        snapToInterval={ITEM_SIZE}
+        decelerationRate={0}
+        bounces={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+        renderItem={({ item, index }) => {
+          if (!item.poster) {
+            return <View style={{ width: SPACER_ITEM_SIZE }} />;
+          }
+
+          const inputRange = [
+            (index - 2) * ITEM_SIZE,
+            (index - 1) * ITEM_SIZE,
+            index * ITEM_SIZE,
+          ];
+
+          const translateY = scrollX.interpolate({
+            inputRange,
+            outputRange: [0, -50, 0],
+          });
+
           return (
             <View style={{ width: ITEM_SIZE }}>
-              <View
+              <Animated.View
                 style={{
                   marginHorizontal: SPACING,
                   padding: SPACING * 2,
                   alignItems: "center",
                   backgroundColor: "white",
                   borderRadius: 34,
+                  transform: [{ translateY }],
                 }}
               >
                 <Image
@@ -68,30 +94,32 @@ export default function App() {
                 <Text style={{ fontSize: 24 }} numberOfLines={1}>
                   {item.title}
                 </Text>
-                <Rating rating={item.rating} />
-                <Genres genres={item.genres} />
+                <Rating rating={item.rating as number} />
+                <Genres genres={item.genres as string[]} />
                 <Text style={{ fontSize: 12 }} numberOfLines={3}>
                   {item.description}
                 </Text>
-              </View>
+              </Animated.View>
             </View>
           );
         }}
       />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  posterImage: {
-    width: "100%",
-    height: ITEM_SIZE * 1.2,
-    resizeMode: "cover",
-    borderRadius: 24,
-    margin: 0,
-    marginBottom: 10,
-  },
+    posterImage: {
+        width: "100%",
+        height: ITEM_SIZE * 1.2,
+        resizeMode: "cover",
+        borderRadius: 24,
+        margin: 0,
+        marginBottom: 10,
+    },
 });
+
+export default App;
