@@ -13,7 +13,7 @@ import { Movie } from "../types";
 
 const { width, height } = Dimensions.get("window");
 
-const ITEM_SIZE = Platform.OS === "ios" ? width * 0.72 : width * 0.74;
+export const ITEM_SIZE = Platform.OS === "ios" ? width * 0.7 : width * 0.74;
 const BACKDROP_HEIGHT = height * 0.65;
 
 interface BackdropProps {
@@ -23,7 +23,13 @@ interface BackdropProps {
 
 const Backdrop: React.FC<BackdropProps> = ({ movies, scrollX }) => {
   return (
-    <View style={{ position: "absolute", width, height: BACKDROP_HEIGHT }}>
+    <View
+      style={{
+        position: "absolute",
+        width,
+        height: BACKDROP_HEIGHT,
+      }}
+    >
       <FlatList
         data={movies.reverse()}
         keyExtractor={(item) => item.key + "-backdrop"}
@@ -41,7 +47,7 @@ const Backdrop: React.FC<BackdropProps> = ({ movies, scrollX }) => {
 
           return (
             <Animated.View
-              removeClippedSubviews={false}
+              // removeClippedSubviews={false}
               style={{
                 position: "absolute",
                 width: translateX,

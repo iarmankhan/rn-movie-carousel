@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { getMovies } from "./src/api";
-import Backdrop from "./src/components/Backdrop";
+import Backdrop, { ITEM_SIZE } from "./src/components/Backdrop";
 import Genres from "./src/components/Genres";
 import Loading from "./src/components/Loading";
 import Rating from "./src/components/Rating";
@@ -19,7 +19,6 @@ import { Movie } from "./src/types";
 
 const { width } = Dimensions.get("window");
 
-const ITEM_SIZE = Platform.OS === "ios" ? width * 0.72 : width * 0.74;
 const SPACING = 10;
 const EMPTY_ITEM_SIZE = (width - ITEM_SIZE) / 2;
 

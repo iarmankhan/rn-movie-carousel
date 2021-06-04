@@ -37,27 +37,30 @@ export const getMovies = async () => {
     async (x) => (await x.json()) as APIResponse
   );
 
-  const movies: Movie[] = results.map(
-    ({
-      id,
-      original_title,
-      poster_path,
-      backdrop_path,
-      vote_average,
-      overview,
-      release_date,
-      genre_ids,
-    }) => ({
-      key: String(id),
-      title: original_title,
-      poster: getImagePath(poster_path),
-      backdrop: getBackdropPath(backdrop_path),
-      rating: vote_average,
-      description: overview,
-      releaseDate: release_date,
-      genres: genre_ids.map((genre: number) => genres[genre]),
-    })
-  );
+  let movies: Movie[] = [];
+  if (results && results?.length) {
+    movies = results.map(
+      ({
+        id,
+        original_title,
+        poster_path,
+        backdrop_path,
+        vote_average,
+        overview,
+        release_date,
+        genre_ids,
+      }) => ({
+        key: String(id),
+        title: original_title,
+        poster: getImagePath(poster_path),
+        backdrop: getBackdropPath(backdrop_path),
+        rating: vote_average,
+        description: overview,
+        releaseDate: release_date,
+        genres: genre_ids.map((genre: number) => genres[genre]),
+      })
+    );
+  }
 
   return movies;
 };

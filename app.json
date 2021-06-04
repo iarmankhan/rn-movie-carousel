@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "HelloWorld",
+    "name": "Movie Carousel",
     "slug": "movie-carousel",
     "version": "1.0.0",
     "orientation": "portrait",
